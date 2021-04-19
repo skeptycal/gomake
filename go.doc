@@ -1,0 +1,10 @@
+package gomake // import "github.com/skeptycal/gomake"
+
+Package gomake is a repo management tool for Go projects.
+
+var ErrBadCount = errors.New("datafile: bad read count") ...
+func MkDir(name string) error
+func New(repoName string) error
+func NewDataFile(filename string) (*datafile, error)
+type DataFile interface{ ... }
+type PathError = os.PathError

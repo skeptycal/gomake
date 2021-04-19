@@ -2,9 +2,9 @@ package gomake
 
 import (
 	"os"
-)
 
-var NewPathError = gofile.NewPathError
+	"github.com/skeptycal/gofile"
+)
 
 func readBak(filename string) ([]byte, error) {
 	_, err := gofile.Copy(filename, filename+".bak")

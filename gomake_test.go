@@ -4,6 +4,8 @@ import (
 	"path/filepath"
 	"reflect"
 	"testing"
+
+	"github.com/skeptycal/gofile"
 )
 
 func TestNewPathError(t *testing.T) {
@@ -22,7 +24,7 @@ func TestNewPathError(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := newPathError(tt.args.op, tt.args.path, tt.args.err); !reflect.DeepEqual(got, tt.want) {
+			if got := gofile.NewPathError(tt.args.op, tt.args.path, tt.args.err); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewPathError() = %v, want %v", got, tt.want)
 			}
 		})
