@@ -6,10 +6,6 @@ import (
 	"github.com/skeptycal/gofile"
 )
 
-func MkDir(name string) error {
-	return os.Mkdir(name, normalMode)
-}
-
 // checkDir checks whether the directory exists and returns
 // an error. If the directory does not exist, it is created.
 // Any errors are of type *PathError

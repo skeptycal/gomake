@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/skeptycal/gofile"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -37,7 +39,7 @@ func NewDataFile(filename string) (*datafile, error) {
 
 	name, err := filepath.Abs(src.Name())
 	if err != nil {
-		return nil, newPathError("could not determine absolute path", src.Name(), err)
+		return nil, gofile.NewPathError("could not determine absolute path", src.Name(), err)
 	}
 
 	df := &datafile{
@@ -165,7 +167,7 @@ func (d *datafile) replace(old, new string) error {
 
 func (d *datafile) writeBak() error {
 
-	_, err := copy(d.Name(), d.bakName())
+	_, err := gofile.Copy(d.Name(), d.bakName())
 
 	if err != nil {
 		return err
