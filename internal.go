@@ -8,6 +8,7 @@ import (
 
 const (
 	normalMode        os.FileMode = 0644
+	dirMode           os.FileMode = 0755
 	defaultBufferSize int         = 1024
 	minBufferSize     int64       = 16
 )

@@ -1,18 +1,6 @@
 // Package gomake is a repo management tool for Go projects.
 package gomake
 
-import (
-	"errors"
-	"os"
-)
-
-var (
-	ErrBadCount   = errors.New("datafile: bad read count")
-	ErrNotRegular = errors.New("datafile: not regular file")
-)
-
-type PathError = os.PathError
-
 // func replace(filename, old, new string) (string, error) {
 /*
 	// 	f, err := New(filename)

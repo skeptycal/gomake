@@ -6,28 +6,17 @@ import (
 	"github.com/skeptycal/gofile"
 )
 
-// checkDir checks whether the directory exists and returns
-// an error. If the directory does not exist, it is created.
+// MkDir creates the directory dir if it does not exist
+// and changes the current working directory to dir.
 // Any errors are of type *PathError
-func checkDir(repoName string) error {
+func MkDir(dir string) error {
 
-	if gofile.IsDir(repoName) {
-		return &os.PathError{
-			Op:   "unable to create directory",
-			Path: repoName,
-			Err:  os.ErrExist,
-		}
-	} else {
-		err := os.Mkdir(repoName, 0755)
-		if err != nil {
-			return err
-		}
-		err = os.Chdir(repoName)
-		if err != nil {
+	if !gofile.IsDir(dir) {
+		if err := os.Mkdir(dir, dirMode); err != nil {
 			return err
 		}
 	}
-	return nil
+	return os.Chdir(dir)
 }
 
 // New creates a new Git repository and GitHub repository for
@@ -36,13 +25,13 @@ func checkDir(repoName string) error {
 // If the name is not given, the parent folder name is used.
 func New(repoName string) error {
 
-	// todo - check for flags
+	// todo - check for CLI flags
 
 	// check for existing directory
 	if repoName == "" {
 		repoName = gofile.PWD()
 	} else {
-		err := checkDir(repoName)
+		err := MkDir(repoName)
 		if err != nil {
 			return err
 		}
