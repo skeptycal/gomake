@@ -6,11 +6,13 @@ import (
 	"github.com/skeptycal/gofile"
 )
 
+type FileMode = os.FileMode
+
 const (
-	normalMode        os.FileMode = 0644
-	dirMode           os.FileMode = 0755
-	defaultBufferSize int         = 1024
-	minBufferSize     int64       = 16
+	normalMode        FileMode = 0644
+	dirMode           FileMode = 0755
+	defaultBufferSize int      = 1024
+	minBufferSize     int64    = 16
 )
 
 func readBak(filename string) ([]byte, error) {

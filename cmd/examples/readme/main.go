@@ -23,27 +23,27 @@ func main() {
 		log.Fatal(err)
 	}
 
-	tmpDir := os.TempDir() // not needed for os.CreateTemp - it is default
-
-	tmpFile, err := os.CreateTemp(tmpDir, "README.md*") // ... but why not
+	tmpFile, err := os.CreateTemp(gomake.TmpDir(), "README.md*") // ... but why not
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	fmt.Println("tmpFile: ", tmpFile.Name())
 
-	readmeTemplate, err := os.Stat(ReadmeTemplate)
+	f, err := os.Stat(ReadmeTemplateName)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("readmeTemplate: ", readmeTemplate.Name())
+	fmt.Println("readmeTemplate: ", f.Name())
 
-	n, err := Copy(readmeTemplate.Name(), tmpFile.Name())
+	n, err := Copy(f.Name(), tmpFile.Name())
 	if err != nil {
 		log.Fatal(err)
 	}
-	if n != readmeTemplate.Size() {
-		log.Fatalf("wrong number of bytes copied: %d != %d", n, readmeTemplate.Size())
+	if n != f.Size() {
+		log.Fatalf("wrong number of bytes copied: %d != %d", n, f.Size())
 	}
+
+	fmt.Println(readmeTemplate)
 }

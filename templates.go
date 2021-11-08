@@ -9,7 +9,7 @@ import (
 	"github.com/skeptycal/gofile"
 )
 
-const templatePath = "template_files"
+const templatePath string = "template_files"
 
 var (
 	ErrNoTemplatePath       = errors.New("template directory not found")
@@ -19,6 +19,7 @@ var (
 
 type PathError = os.PathError
 
+// ReadTemplate returns the contents of a template file.
 func ReadTemplate(name string) (string, error) {
 
 	if !TemplatesAvailable {
