@@ -1,14 +1,14 @@
 package gomake
 
 import (
-	"bufio"
+	"bytes"
 	"context"
+	"crypto"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
 	"io"
 	"log"
-	"time"
 )
 
 const (
@@ -16,9 +16,17 @@ const (
 )
 
 var (
-	ctxEncrypt context.Context
 
-	// EnccryptMode is set to true to encrypt all temporary files.
+	// ctxEncrypt is the global parent context when encryption is disabled.
+	ctxDefault context.Context = context.TODO()
+
+	// ctxEncrypt is the global parent context when encryption is enabled.
+	ctxEncrypt context.Context = context.TODO()
+
+	// ctxParent is the global parent context chosen from ctxDefault and ctxEncrypt.
+	ctxParent context.Context
+
+	// DefaultEncryptMode is set to true to encrypt all files.
 	DefaultEncryptMode bool = true
 
 	// tempKey is the private key used for encryption of files.
@@ -49,31 +57,46 @@ var (
 	gcm cipher.AEAD
 )
 
-func init() {
-	ctxEncrypt = context.TODO()
-	CheckCLI("encrypt")
-	if DefaultEncryptMode {
-		setupEncryption()
-	}
+type Crypt interface {
+	crypto.Decrypter
+	Init() error
+	IsEnabled() bool
+	Enable(enabled bool)
+
+	Decrypt([]byte) ([]byte, error)
+	Encrypt([]byte) []byte
 }
 
-// CheckCLI checks the CLI options for a particular parameter.
+type crypt struct {
+	enabled bool
+	bytes   int
+	key     []byte
+	block   cipher.Block
+	nonce   []byte
+	gcm     cipher.AEAD
+}
+
+func (c *crypt) Enable(enabled bool) { c.enabled = enabled }
+func (c *crypt) IsEnabled() bool     { return c.enabled }
+
+func (c *crypt) Decrypt(data []byte) (out []byte, err error) {
+	return gcm.Open(out[:0], c.nonce, data, nil)
+}
+func (c *crypt) Encrypt(data []byte) (out []byte) {
+	return gcm.Seal(out[:0], c.nonce, data, nil)
+}
+
+// AEAD is a cipher mode providing authenticated encryption with associated
+// data. For a description of the methodology, see
+//	https://en.wikipedia.org/wiki/Authenticated_encryption
+
+// setupEncryption is called once when the program is initialized if
+// encryption is config.EncryptMode is true (the default is false).
 //
-// TODO - not implemented yet
-// (returns true by default; use command = "false" to test false result)
-func CheckCLI(command string) bool {
-	// TODO - not implemented yet
-	if command == "false" {
-		return false
-	}
-	return true
-}
-
-// setupEncryption is called once when the program is initialized.
 // A random 32-byte private key is generated that is used throughout
 // the current session.
 //
-// Support for key timeouts is not implemented.
+// TODO - Support for key timeouts is not implemented.
 func setupEncryption() {
 	tempKey, err := makeKey(defaultKeySize)
 	if err != nil {
@@ -85,22 +108,28 @@ func setupEncryption() {
 		log.Panic(err)
 	}
 
-	// Never use more than 2^32 random nonces with a given key
-	// because of the risk of repeat.
-	nonce := make([]byte, gcm.NonceSize())
-	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-		log.Fatal(err)
-	}
-
-	gcm, err := cipher.NewGCM(block)
+	gcm, err = cipher.NewGCM(block)
 	if err != nil {
 		log.Panic(err)
+	}
+
+	// Never use more than 2^32 random nonces with a given key
+	// because of the risk of repeat.
+
+	nonce = make([]byte, gcm.NonceSize())
+	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
+		log.Fatal(err)
 	}
 }
 
 // makeKey generates a slice of random bytes of length n.
+//
+// Alternatively, use the following CLI command (32 bytes):
+//
+//  dd if=/dev/urandom of=encrypt.key count=1 bs=32
 func makeKey(n int) (key []byte, err error) {
-	key = make([]byte, 0, n)
+	key = make([]byte, n)
+	// defer clearKey(&key)
 
 	_, err = rand.Read(key)
 	if err != nil {
@@ -110,14 +139,10 @@ func makeKey(n int) (key []byte, err error) {
 }
 
 // encrypt encrypts the contents of p.
-func encrypt(p []byte) []byte {
+func encrypt(p []byte) (buf []byte) {
 	// TODO - not implemented
-	ctx, cancel := context.WithTimeout(ctx, 100*time.Millisecond)
 
-	ciphertext := gcm.Seal(nonce, nonce, p, nil)
-	var buf []byte = []byte{}
-
-	return p
+	return gcm.Seal(buf, nonce, p, nil)
 }
 
 // decrypt decrypts the contents of p.
@@ -126,37 +151,16 @@ func decrypt(p []byte) []byte {
 	return p
 }
 
-type EncryptedFile struct {
-	filename  string
-	encrypted bool
-	ctx       context.Context
-	rw        bufio.ReadWriter
-}
-
-func (f *EncryptedFile) Write(p []byte) (n int, err error) {
-	var buf []byte
-	if !f.encrypted {
-		buf = p
-	} else { // using 'else' ... when all else fails ...
-		buf = encrypt(p)
-	}
-	return f.rw.Write(buf)
-}
-
-// Read reads data into p. It returns the number of bytes read into p.
-// The bytes are taken from at most one Read on the underlying Reader,
-// hence n may be less than len(p). To read exactly len(p) bytes, use
-// io.ReadFull(b, p).
+// clearKey clears the value of the random key after it is
+// used for encryption of files.
 //
-// At EOF, the count will be zero and err will be io.EOF.
-func (f *EncryptedFile) Read(p []byte) (n int, err error) {
-	if !f.encrypted {
-		return f.rw.Read(p)
-	} else {
-		var buf []byte = []byte{}
-		n, err = f.rw.Read(buf)
-		p = decrypt(buf)
-		buf = []byte{}
-		return n, err
-	}
+// It is an experimental feature and is not secure.
+//
+// This is NOT a secure operation and does not prevent
+// the copying, garbage collection, or disk swapping
+// of the values.
+func clearKey(key *[]byte) {
+	n := cap(*key)
+	*key = nil
+	*key = bytes.Repeat([]byte{'0'}, n)
 }

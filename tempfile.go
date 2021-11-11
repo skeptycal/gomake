@@ -4,44 +4,16 @@ import (
 	"context"
 	"os"
 	"path"
-	"time"
 
 	"github.com/skeptycal/gofile"
 )
 
-const (
-	defaultReadTimeout  time.Duration = 1 * time.Second
-	defaultWriteTimeout time.Duration = 1 * time.Second
-	defaultIdleTimeout  time.Duration = 10 * time.Minute
-)
-
-var (
-	// TempDir is a common temporary directory that is used throughout
-	// this codebase.
-	// It is the responsibility of the user to ensure that it is deleted
-	// upon exiting.
-	TempDir string = ""
-)
-
-func init() {
-	config = NewConfig(ctxTemp)
-	TempDir = CreateTempDir("")
-}
-
-func GetFileCtx() (ctx context.Context, cancelfunc context.CancelFunc) {
-	return context.WithTimeout(ctxEncrypt, config.IdleTimeout)
-}
-
-func NewTempFile(ctx context.Context, filename string, encryptMode bool) (file *EncryptedFile, err error) {
-	return newTempFile(ctx, filename)
-}
-
-func newTempFile(ctx context.Context, filename string) (file *EncryptedFile, err error) {
-	return &EncryptedFile{
-		filename:  filename,
-		encrypted: config.encryptMode,
-		timeout:   defaultIdleTimeout,
-	}, nil
+func newTempFile(ctx context.Context, filename string) TempFile {
+	if !config.encryptMode {
+		return &file{filename: filename}
+	}
+	f := &file{filename: filename}
+	return &EncryptedFile{f, config.encryptMode}
 }
 
 // CreateTempDir returns the path of a new temporary directory
@@ -55,7 +27,7 @@ func newTempFile(ctx context.Context, filename string) (file *EncryptedFile, err
 //
 // If the system default is unavailable for any reason, a directory is created
 // in the current with a random name based on altName.
-func CreateTempDir(altName string) string {
+func CreateTempDir(filepath string) string {
 
 	tmpdir := os.TempDir()
 
@@ -68,9 +40,10 @@ func CreateTempDir(altName string) string {
 
 		tmpdir, err := os.MkdirTemp(filepath, goMakeTempDir)
 		if err != nil {
-
 			return gofile.PWD() + sep + goMakeTempDir
 		}
+
+		return tmpdir
 	}
 
 	tmpdir, err := os.MkdirTemp(tmpdir, goMakeTempDir+"*")

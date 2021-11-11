@@ -9,22 +9,23 @@ import (
 )
 
 func PPrint(v Any) {
-	a := ansi.NewAnsiString(ansi., s string)
-
 	color := ansi.NewColor(1, 0, 0)
+
+	a := ansi.NewAnsiString(color, v.(string))
+
 	switch t := v.(type) {
 
 	case int, float32, float64, bool:
-		fmt.Printf("%v\n", v)
+		fmt.Printf("%v%v\n", a, v)
 
 	case string:
-		fmt.Printf("%v\n", v)
+		fmt.Printf("%v%v\n", a, v)
 
 	default:
-		ansi.Print(color, "(type %v) %v\n", t, v)
+		fmt.Printf("%v(type %v) %v\n", color, t, v)
 
 	}
-	ansi.Reset()
+	fmt.Print(ansi.Reset)
 }
 
 var PPrintMap map[string]int = map[string]int{

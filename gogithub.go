@@ -6,23 +6,16 @@ import (
 	"context"
 	"fmt"
 
-	log "github.com/sirupsen/logrus"
-
 	github "github.com/google/go-github/v34/github"
+	"github.com/skeptycal/errorlogger"
 )
 
-type Any interface{}
+var (
+	Log = errorlogger.Log
+	Err = errorlogger.Err
+)
 
 var client *github.Client = github.NewClient(nil)
-
-// Err is used to check errors and exit immediately with
-// a log message if the error is not nil.
-func Err(err error) error {
-	if err != nil {
-		log.Error(err)
-	}
-	return err
-}
 
 func Orgs() error {
 

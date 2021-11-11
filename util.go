@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/skeptycal/gofile"
 )
@@ -15,28 +14,23 @@ const (
 	sep           = string(os.PathSeparator)
 )
 
-var (
-	config  *FileConfig     = NewConfig()
-	ctxTemp context.Context = context.Background()
+type (
+	Any interface{}
+	any struct{}
 )
 
-// FileConfig is used to configure timeouts for temporary file operations.
-type FileConfig struct {
-	encryptMode  bool
-	parent       context.Context
-	ReadTimeout  time.Duration
-	WriteTimeout time.Duration
-	IdleTimeout  time.Duration
-}
+var ctxTemp context.Context = context.Background()
 
-func NewConfig() *FileConfig {
-	return &FileConfig{
-		encryptMode:  DefaultEncryptMode,
-		ReadTimeout:  defaultReadTimeout,
-		WriteTimeout: defaultWriteTimeout,
-		IdleTimeout:  defaultIdleTimeout,
-		parent:       ctxTemp,
+// CheckCLI checks the CLI options for a particular parameter.
+//
+// TODO - not implemented yet
+// (returns true by default; use command = "false" to test false result)
+func CheckCLI(command string) bool {
+	// TODO - not implemented yet
+	if command == "false" {
+		return false
 	}
+	return true
 }
 
 func StatCheck(filename string) (os.FileInfo, error) {
