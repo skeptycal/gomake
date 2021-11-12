@@ -22,6 +22,8 @@ type fileCTX struct {
 
 var tmpCTX context.Context = ctxParent
 
+// var ctxTemp context.Context = context.Background()
+
 // IdleCTX returns a context with a timeout(deadline) based on
 // the config.IdleTimeout setting.
 //

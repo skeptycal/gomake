@@ -41,17 +41,22 @@ func (f *EncryptedFile) Write(p []byte) (n int, err error) {
 // io.ReadFull(b, p).
 //
 // At EOF, the count will be zero and err will be io.EOF.
+//
+// If an error is occurs while encryption is enabled, the error is
+// returned and p is unchanged.
 func (f *EncryptedFile) Read(p []byte) (n int, err error) {
+	ptr := &p
 	if !f.encrypted {
-		return f.ReadWriter.Read(p)
+		return f.ReadWriter.Read(*ptr)
 	} else {
 		var buf []byte = []byte{}
 		n, err = f.ReadWriter.Read(buf)
 		if err != nil {
 			return n, err
 		}
-		p = decrypt(buf)
-		buf = []byte{}
+
+		*ptr = decrypt(buf)
+		buf = nil
 		return n, err
 	}
 }

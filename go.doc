@@ -7,17 +7,16 @@ Package gomake is a repo management tool for Go projects.
 
 var TempDir string = "" ...
 var DefaultEncryptMode bool ...
-var Log = errorlogger.Log ...
 var ErrNoTemplatePath = errors.New("template directory not found") ...
+var Log = errorlogger.Log ...
 var PPrintAnySlice []Any = []Any{ ... }
 var PPrintMap map[string]int = map[string]int{ ... }
 var PPrintSamples []Any = []Any{ ... }
-func CheckCLI(command string) bool
+func CheckCLI(key string) (ok bool)
 func CheckENV(key string) (string, bool)
 func CreateTempDir(filepath string) string
 func MakeLocalTempDir(filepath string) string
 func MkDir(dir string) error
-func New(repoName string) error
 func Orgs() error
 func PPrint(v Any)
 func PathError(Op, path string, err error) error
@@ -26,11 +25,17 @@ func SamplePPrint(samples []Any)
 func StatCheck(filename string) (os.FileInfo, error)
 type Any interface{}
     var PPrintAny Any = PPrintMap
+    func GetCLI(key string) (v Any, ok bool)
 type Args map[string]Any
+    var CliArgs Args
 type Crypt interface{ ... }
 type EncryptedFile struct{ ... }
 type FileCTX interface{ ... }
 type FileConfig struct{ ... }
     func NewConfig() *FileConfig
 type FileMode = os.FileMode
+type None struct{}
+type Noner interface{}
+type Repo interface{ ... }
+    func New(repoName string) (Repo, error)
 type TempFile interface{ ... }

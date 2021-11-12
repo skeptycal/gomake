@@ -7,12 +7,6 @@ import (
 	"fmt"
 
 	github "github.com/google/go-github/v34/github"
-	"github.com/skeptycal/errorlogger"
-)
-
-var (
-	Log = errorlogger.Log
-	Err = errorlogger.Err
 )
 
 var client *github.Client = github.NewClient(nil)

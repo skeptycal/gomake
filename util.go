@@ -1,11 +1,11 @@
 package gomake
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 
+	"github.com/skeptycal/errorlogger"
 	"github.com/skeptycal/gofile"
 )
 
@@ -14,23 +14,38 @@ const (
 	sep           = string(os.PathSeparator)
 )
 
-type (
-	Any interface{}
-	any struct{}
+var (
+	// Log is the default global ErrorLogger. It implements the ErrorLogger interface as well as the basic logrus.Logger interface, which is compatible with the standard library "log" package.
+	//
+	// In the case of name collisions with 'Log', use an alias instead of creating a new instance. For example:
+	//
+	//  var mylogthatwontmessthingsup = errorlogger.Log
+	Log = errorlogger.Log
+
+	// Err is the logging function for the global ErrorLogger.
+	Err = errorlogger.Err
 )
 
-var ctxTemp context.Context = context.Background()
+type (
+	Any interface{}
+	// any struct{}
+)
 
-// CheckCLI checks the CLI options for a particular parameter.
+// Noner is the interface that implements features of the
+// None type, including fmt.Stringer to return the string "None".
 //
-// TODO - not implemented yet
-// (returns true by default; use command = "false" to test false result)
-func CheckCLI(command string) bool {
-	// TODO - not implemented yet
-	if command == "false" {
-		return false
-	}
-	return true
+// It is purely for testing purposes ... and a few laughs.
+type Noner interface{}
+
+// None is an empty struct{} that represents no value. It is
+// meant to represent a value that has not been measured and is
+// otherwise unknown.
+//
+// None implements fmt.Stringer to return the string "None"
+type None struct{}
+
+func (n None) String() string {
+	return "None"
 }
 
 func StatCheck(filename string) (os.FileInfo, error) {
@@ -86,13 +101,30 @@ func MkDir(dir string) error {
 	return os.Chdir(dir)
 }
 
+type repo struct {
+	name string
+}
+
+type Repo interface {
+	fmt.Stringer
+}
+
+func newRepo(name string) (Repo, error) {
+	return nil, nil
+}
+
 // New creates a new Git repository and GitHub repository for
 // a new Go project.
 //
 // If the name is not given, the parent folder name is used.
-func New(repoName string) error {
+func New(repoName string) (Repo, error) {
 
+	var r *repo
 	// todo - check for CLI flags
+
+	if gofile.IsDir(repoName) {
+		return newRepo(repoName)
+	}
 
 	// check for existing directory
 	if repoName == "" {
@@ -100,9 +132,11 @@ func New(repoName string) error {
 	} else {
 		err := MkDir(repoName)
 		if err != nil {
-			return err
+			return nil, fmt.Errorf("error creating directory %v", repoName)
 		}
 	}
+
+	r.name = repoName
 
 	// check for existing git repo
 
@@ -116,5 +150,5 @@ func New(repoName string) error {
 
 	// create .gitignore
 
-	return nil
+	return nil, err
 }

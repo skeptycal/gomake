@@ -59,7 +59,7 @@ func NewConfig() *FileConfig {
 		ReadTimeout:  defaultReadTimeout,
 		WriteTimeout: defaultWriteTimeout,
 		IdleTimeout:  defaultIdleTimeout,
-		parent:       ctxTemp,
+		parent:       ctxParent,
 	}
 }
 

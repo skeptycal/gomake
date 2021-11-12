@@ -63,7 +63,7 @@ type Crypt interface {
 	IsEnabled() bool
 	Enable(enabled bool)
 
-	Decrypt([]byte) ([]byte, error)
+	// Decrypt([]byte) ([]byte, error)
 	Encrypt([]byte) []byte
 }
 
