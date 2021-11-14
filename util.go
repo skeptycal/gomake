@@ -150,5 +150,5 @@ func New(repoName string) (Repo, error) {
 
 	// create .gitignore
 
-	return nil, err
+	return nil, nil
 }

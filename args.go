@@ -36,7 +36,7 @@ func (a Args) Set(key string, value Any) error {
 // Name returns the name of the program.
 func (a Args) Name() string {
 	if len(a) < 1 {
-		a.Parse()
+		_ = Err(a.Parse())
 	}
 	return a["program name"].(string)
 }

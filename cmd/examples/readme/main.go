@@ -5,7 +5,7 @@ import (
 	"os"
 
 	log "github.com/sirupsen/logrus"
-	. "github.com/skeptycal/gofile"
+	"github.com/skeptycal/gofile"
 	"github.com/skeptycal/gomake"
 )
 
@@ -23,7 +23,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	tmpFile, err := os.CreateTemp(gomake.TmpDir(), "README.md*") // ... but why not
+	tmpDir := gomake.CreateTempDir("")
+
+	tmpFile, err := os.CreateTemp(tmpDir, "README.md*")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -37,7 +39,7 @@ func main() {
 
 	fmt.Println("readmeTemplate: ", f.Name())
 
-	n, err := Copy(f.Name(), tmpFile.Name())
+	n, err := gofile.Copy(f.Name(), tmpFile.Name())
 	if err != nil {
 		log.Fatal(err)
 	}
