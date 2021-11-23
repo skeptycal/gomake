@@ -7,5 +7,6 @@ import (
 )
 
 func main() {
-	fmt.Println(gomake.CliArgs)
+	args := gomake.NewCLIArgs()
+	fmt.Println(args)
 }

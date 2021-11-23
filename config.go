@@ -18,15 +18,21 @@ var (
 	// upon exiting.
 	TempDir string = ""
 
+	// CliArgs contains the command line arguments.
+	CliArgs Args = NewCLIArgs()
+
 	config *FileConfig = NewConfig()
+
+	// argList =
 )
 
 func init() {
+
 	config = NewConfig()
 
 	config.encryptMode = DefaultEncryptMode
 
-	if CheckCLI("encrypt") {
+	if CliArgs.Exists("encrypt") {
 		config.encryptMode = true
 	}
 
