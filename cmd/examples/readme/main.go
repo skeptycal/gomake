@@ -18,7 +18,7 @@ const (
 
 func main() {
 
-	readmeTemplate, err := gomake.ReadTemplate(ReadmeTemplateName)
+	readmeTemplateContents, err := gomake.ReadTemplate(ReadmeTemplateName)
 	if err != nil {
 		log.Fatal(err)
 	}

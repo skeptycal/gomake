@@ -4,27 +4,26 @@ import (
 	"bytes"
 	"fmt"
 	"strings"
-
-	"github.com/skeptycal/ansi"
 )
 
 func PPrint(v Any) {
-	a := ansi.NewAnsiString(ansi., s string)
+	// a := ansi.NewAnsiString(ansi.NewColor(Black, Black, Bold))
 
-	color := ansi.NewColor(1, 0, 0)
+	// color := ansi.NewColor(1, 0, 0)
 	switch t := v.(type) {
 
 	case int, float32, float64, bool:
-		fmt.Printf("%v\n", v)
+		fmt.Printf("%v\n", t)
 
 	case string:
-		fmt.Printf("%v\n", v)
+		fmt.Printf("%q\n", t)
 
 	default:
-		ansi.Print(color, "(type %v) %v\n", t, v)
+		// ansi.Print(color, "(type %v) %v\n", t, v)
+		fmt.Printf("(type %T) %v\n", t, t)
 
 	}
-	ansi.Reset()
+	// ansi.Reset()
 }
 
 var PPrintMap map[string]int = map[string]int{

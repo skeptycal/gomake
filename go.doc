@@ -1,0 +1,27 @@
+package gomake // import "github.com/skeptycal/gomake"
+
+Package gogithub implements a set of functions that access the GitHub API
+v3.0
+
+Package gomake is a repo management tool for Go projects.
+
+var ErrNoTemplatePath = errors.New("template directory not found") ...
+var OptionFileTruncate = anybool.AnyBooler(true)
+var PPrintAnySlice []Any = []Any{ ... }
+var PPrintMap map[string]int = map[string]int{ ... }
+var PPrintSamples []Any = []Any{ ... }
+func Copy(dstName, srcName string) error
+func DoTrunc() bool
+func Err(err error) error
+func Example()
+func MkDir(dir string) error
+func New(repoName string) error
+func Orgs() error
+func PPrint(v Any)
+func ReadTemplate(name string) (string, error)
+func SamplePPrint(samples []Any)
+type AnsiString struct{ ... }
+type Any interface{}
+    var PPrintAny Any = PPrintMap
+type Mapper interface{ ... }
+type PathError = os.PathError
