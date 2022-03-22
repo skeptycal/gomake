@@ -66,7 +66,7 @@ type cliSettings struct {
 }
 
 func (c *cliSettings) Ansi(fg, bg, ef byte) string {
-
+	return ""
 }
 
 func (c *cliSettings) Main() string {
@@ -106,7 +106,7 @@ var OptionFileTruncate = anybool.AnyBooler(true)
 
 func Copy(dstName, srcName string) error {
 
-	fi, err := gofile.StatCheck(dstName)
+	_, err := gofile.StatCheck(dstName)
 	if err != nil {
 		if errors.Is(err, os.ErrExist) {
 			return err
@@ -124,6 +124,7 @@ func Copy(dstName, srcName string) error {
 	}
 
 	io.Copy(dst, src)
+	return nil
 }
 
 func readBak(filename string) ([]byte, error) {
@@ -134,4 +135,5 @@ func readBak(filename string) ([]byte, error) {
 	// }
 
 	// return os.ReadFile(filename)
+	return nil, nil
 }

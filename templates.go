@@ -9,15 +9,63 @@ import (
 	"github.com/skeptycal/gofile"
 )
 
-const templatePath = "template_files"
+const defaultTemplatePath = "template_files"
 
 var (
-	ErrNoTemplatePath       = errors.New("template directory not found")
-	ErrNoTemplate           = errors.New("template file not found")
-	TemplatesAvailable bool = false
+	ErrNoTemplatePath  error = errors.New("template directory not found")
+	ErrNoTemplate      error = errors.New("template file not found")
+	TemplatesAvailable bool  = false
+	tempDir            *templateDir
 )
 
 type PathError = os.PathError
+
+func init() {
+	var err error
+	tempDir, err = NewTemplateDir(defaultTemplatePath)
+	if err != nil {
+		TemplatesAvailable = false
+	} else {
+		TemplatesAvailable = true
+	}
+}
+
+func NewTemplateDir(path string) (*templateDir, error) {
+
+}
+
+func NewTemplateFile(filename string) (*templateFile, error) {
+	templateFileName := filepath.Join(defaultTemplatePath, filename)
+
+	b, err := os.ReadFile(templateFileName)
+	if err != nil {
+		return "", &PathError{"ReadTemplate#os.Readfile", name, err}
+	}
+}
+
+type TemplateDir interface {
+
+	// types.Enabler
+	Enable()
+	Disable()
+}
+
+type (
+	templateDir struct {
+		enabled      bool
+		templatePath string
+	}
+
+	templateFile struct {
+		fi       os.FileInfo
+		contents []byte
+		isDirty  bool
+	}
+)
+
+func (t *templateDir) GetFile(name string) (*templateFile, error) {
+
+}
 
 func ReadTemplate(name string) (string, error) {
 
@@ -25,7 +73,7 @@ func ReadTemplate(name string) (string, error) {
 		return "", ErrNoTemplatePath
 	}
 
-	templateFileName := filepath.Join(templatePath, name)
+	templateFileName := filepath.Join(defaultTemplatePath, name)
 
 	b, err := os.ReadFile(templateFileName)
 	if err != nil {
@@ -36,8 +84,8 @@ func ReadTemplate(name string) (string, error) {
 }
 
 func init() {
-	if !gofile.IsDir(templatePath) {
-		err := &PathError{"ReadTemplate#gofile.IsDir", templatePath, ErrNoTemplate}
+	if !gofile.IsDir(defaultTemplatePath) {
+		err := &PathError{"ReadTemplate#gofile.IsDir", defaultTemplatePath, ErrNoTemplate}
 		log.Info(err)
 		TemplatesAvailable = false
 	} else {
