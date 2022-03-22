@@ -5,7 +5,7 @@ v3.0
 
 Package gomake is a repo management tool for Go projects.
 
-var ErrNoTemplatePath = errors.New("template directory not found") ...
+var ErrNoTemplatePath error = errors.New("template directory not found") ...
 var OptionFileTruncate = anybool.AnyBooler(true)
 var PPrintAnySlice []Any = []Any{ ... }
 var PPrintMap map[string]int = map[string]int{ ... }
@@ -20,8 +20,11 @@ func Orgs() error
 func PPrint(v Any)
 func ReadTemplate(name string) (string, error)
 func SamplePPrint(samples []Any)
+func NewTemplateDir(path string) (*templateDir, error)
+func NewTemplateFile(filename string) (*templateFile, error)
 type AnsiString struct{ ... }
 type Any interface{}
     var PPrintAny Any = PPrintMap
 type Mapper interface{ ... }
 type PathError = os.PathError
+type TemplateDir interface{ ... }
