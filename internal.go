@@ -18,6 +18,10 @@ const (
 	minBufferSize     int64       = 16
 )
 
+func init() {
+	d := defaults.NewDefaults(false, false)
+}
+
 type Mapper interface {
 	Get(key string) (Any, error)
 	Set(key string, value Any) error
