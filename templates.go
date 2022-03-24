@@ -64,10 +64,10 @@ func ReadTemplate(fileName string) (string, error) {
 
 	b, err := os.ReadFile(templateFileName)
 	if err != nil {
-		return "", &PathError{"ReadTemplate#os.Readfile", fileName, err}
+		return "", gofile.NewGoFileError("ReadTemplate#os.Readfile()", fileName, err)
 	}
 
-	return "", nil
+	return string(b), nil
 }
 
 type TemplateDir interface {

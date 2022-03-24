@@ -8,6 +8,7 @@ require (
 	github.com/skeptycal/anybool v0.1.0-1643737876466933
 	github.com/skeptycal/defaults v0.1.0-1643822605979528
 	github.com/skeptycal/gofile v0.5.0
+	github.com/skeptycal/types v0.5.0
 )
 
 require (
@@ -19,7 +20,6 @@ require (
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/skeptycal/errorlogger v0.5.0 // indirect
-	github.com/skeptycal/types v0.5.0 // indirect
 	github.com/stretchr/testify v1.7.1 // indirect
 	golang.org/x/crypto v0.0.0-20220321153916-2c7772ba3064 // indirect
 	golang.org/x/sys v0.0.0-20220319134239-a9b59b0215f8 // indirect
