@@ -18,9 +18,7 @@ const (
 	minBufferSize     int64       = 16
 )
 
-func init() {
-	d := defaults.NewDefaults(false, false)
-}
+var Options defaults.DefaultMapper = defaults.NewDefaults(false, false)
 
 type Mapper interface {
 	Get(key string) (Any, error)

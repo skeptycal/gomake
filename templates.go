@@ -1,12 +1,13 @@
 package gomake
 
 import (
+	"bytes"
 	"errors"
 	"os"
 	"path/filepath"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/skeptycal/gofile"
+	"github.com/skeptycal/types"
 )
 
 const defaultTemplatePath = "template_files"
@@ -23,7 +24,7 @@ type PathError = os.PathError
 func init() {
 	var err error
 	tempDir, err = NewTemplateDir(defaultTemplatePath)
-	if err != nil {
+	if Err(err) != nil {
 		TemplatesAvailable = false
 	} else {
 		TemplatesAvailable = true
@@ -31,64 +32,63 @@ func init() {
 }
 
 func NewTemplateDir(path string) (*templateDir, error) {
-
+	return nil, gofile.ErrNotImplemented
 }
 
-func NewTemplateFile(filename string) (*templateFile, error) {
-	templateFileName := filepath.Join(defaultTemplatePath, filename)
+func NewTemplateFile(fileName string) (*templateFile, error) {
+	templateFileName := filepath.Join(defaultTemplatePath, fileName)
+
+	fi, err := os.Stat(templateFileName)
+	if err != nil {
+		return nil, gofile.NewGoFileError("NewTemplateFile#os.Stat()", templateFileName, err)
+	}
 
 	b, err := os.ReadFile(templateFileName)
 	if err != nil {
-		return "", &PathError{"ReadTemplate#os.Readfile", name, err}
-	}
-}
-
-type TemplateDir interface {
-
-	// types.Enabler
-	Enable()
-	Disable()
-}
-
-type (
-	templateDir struct {
-		enabled      bool
-		templatePath string
+		return nil, gofile.NewGoFileError("NewTemplateFile#os.Readfile()", templateFileName, err)
 	}
 
-	templateFile struct {
-		fi       os.FileInfo
-		contents []byte
-		isDirty  bool
-	}
-)
+	buf := bytes.NewBuffer(make([]byte, 0, int(float64(len(b))*1.5)))
+	buf.Write(b)
 
-func (t *templateDir) GetFile(name string) (*templateFile, error) {
-
+	return &templateFile{fi: fi, contents: buf, isDirty: false}, nil
 }
 
-func ReadTemplate(name string) (string, error) {
+func ReadTemplate(fileName string) (string, error) {
 
 	if !TemplatesAvailable {
 		return "", ErrNoTemplatePath
 	}
 
-	templateFileName := filepath.Join(defaultTemplatePath, name)
+	templateFileName := filepath.Join(defaultTemplatePath, fileName)
 
 	b, err := os.ReadFile(templateFileName)
 	if err != nil {
-		return "", &PathError{"ReadTemplate#os.Readfile", name, err}
+		return "", &PathError{"ReadTemplate#os.Readfile", fileName, err}
 	}
 
 	return "", nil
 }
 
-func init() {
-	if !gofile.IsDir(defaultTemplatePath) {
-		err := &PathError{"ReadTemplate#gofile.IsDir", defaultTemplatePath, ErrNoTemplate}
-		log.Info(err)
-		TemplatesAvailable = false
-	} else {
-		TemplatesAvailable = true
-	}
+type TemplateDir interface {
+	types.Enabler
+	GetFile(name string) (*templateFile, error)
+}
+
+type templateDir struct {
+	enabled      bool
+	templatePath string
+}
+
+func (d *templateDir) Enable()  { d.enabled = true }
+func (d *templateDir) Disable() { d.enabled = false }
+
+type templateFile struct {
+	fi       os.FileInfo
+	contents *bytes.Buffer
+	isDirty  bool
+}
+
+func (t *templateDir) GetFile(name string) (*templateFile, error) {
+	return nil, gofile.ErrNotImplemented
 }
